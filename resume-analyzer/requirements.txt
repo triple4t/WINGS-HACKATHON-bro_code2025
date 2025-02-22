@@ -1,7 +1,0 @@
-gradio
-joblib
-pandas
-scikit-learn
-PyPDF2
-nltk
-spacy
