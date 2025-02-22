@@ -3,6 +3,7 @@ import joblib
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import os
 
@@ -13,6 +14,28 @@ def load_model():
     model = joblib.load(model_path)
     vectorizer = joblib.load(vectorizer_path)
     return model, vectorizer
+
+
+
+def combined_similarity(resume_clean, jd_clean, vectorizer):
+    """Compute combined similarity using both Jaccard and Cosine similarity."""
+    # Preprocessing: Split into tokens (sets)
+    resume_tokens = set(resume_clean.split())
+    jd_tokens = set(jd_clean.split())
+    
+    # Jaccard similarity
+    jaccard_sim = jaccard_similarity(resume_tokens, jd_tokens)
+    
+    # Cosine similarity
+    resume_vec = vectorizer.transform([resume_clean])
+    jd_vec = vectorizer.transform([jd_clean])
+    cosine_sim = cosine_similarity(resume_vec, jd_vec)[0][0]
+    
+    # Combine the two similarities (adjusted weightings)
+    combined_score = (0.7 * cosine_sim) + (0.3 * jaccard_sim)  # Adjusted weighting
+    
+    return combined_score
+
 
 
 def train_and_save_model():

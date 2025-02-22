@@ -1,23 +1,30 @@
-# skill_extraction.py
-from collections import defaultdict
-import re
+# utils/skill_extraction.py
+import spacy
+import nltk
+from nltk.corpus import stopwords
 
-SKILLS = {
-    'data_science': {'python', 'r', 'sql', 'tensorflow', 'pytorch', 'spark', 'hadoop', 'pandas', 'numpy', 'statistics', 'mlops'},
-    'devops': {'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'terraform', 'ansible', 'jenkins', 'gitlab', 'prometheus', 'grafana'},
-    'web_dev': {'javascript', 'react', 'angular', 'vue', 'node.js', 'django', 'flask', 'php', 'wordpress', 'css', 'html5', 'rest', 'graphql'},
-    'app_dev': {'swift', 'kotlin', 'flutter', 'react native', 'android', 'ios', 'xcode', 'firebase', 'mobile testing', 'push notifications'},
-    'hr': {'recruitment', 'onboarding', 'employee relations', 'compensation', 'performance management', 'hr analytics', 'successfactors'},
-    'advocate': {'litigation', 'contract law', 'ip law', 'legal research', 'corporate law', 'dispute resolution', 'compliance'}
-}
+# Download stopwords from NLTK
+nltk.download('stopwords')
+
+# Load SpaCy model for Named Entity Recognition (NER)
+nlp = spacy.load("en_core_web_sm")
+
+# Remove stopwords from NLTK
+stop_words = set(stopwords.words('english'))
 
 def extract_skills(text):
-    tokens = set(re.sub(r'\s+', ' ', text).split())
-    found_skills = defaultdict(set)
-
-    for skill in SKILLS:
-        if skill in tokens or skill.replace('.', '') in tokens:
-            for category in SKILLS[skill]:
-                found_skills[category].add(skill)
-
-    return found_skills
+    """Extract skills using Named Entity Recognition (NER) and filtering stopwords."""
+    doc = nlp(text)
+    
+    # Extract skills/entities using NER
+    skills = []
+    for ent in doc.ents:
+        if ent.label_ == "SKILL":  # Customize to suit your NER model
+            skills.append(ent.text.lower())  # Normalize skill names to lowercase
+    
+    # Remove stopwords and lemmatize the words
+    filtered_tokens = [
+        token.lemma_ for token in doc if token.text not in stop_words
+    ]
+    
+    return list(set(skills + filtered_tokens))  # Merge skills and filtered tokens
