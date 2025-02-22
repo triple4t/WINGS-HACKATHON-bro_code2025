@@ -215,7 +215,7 @@ def analyze_resume_interface(pdf_file, job_description):
     
     return (
         result["ATS Score"],
-        result["Resume Score"],
+        # result["Resume Score"],
         result["Matched Skills"],
         result["Missing Skills"],
         result["Suggestions"],
@@ -235,11 +235,11 @@ interface = gr.Interface(
     ],
     outputs=[
         gr.Textbox(label="ATS Score"),
+        # gr.Textbox(label="Missing Skills"),
+        gr.Textbox(label="Matched Skills"),
         gr.Textbox(label="Missing Skills"),
-        gr.Textbox(label="Recommendations"),
+        gr.Textbox(label="Suggestions"),
         gr.Textbox(label="Font Consistency"),
-        gr.Textbox(label="Headings"),
-        gr.Textbox(label="Bullet Points"),
         gr.Textbox(label="Whitespace Management"),
         gr.Textbox(label="Formatting Score")
     ],
